@@ -1,0 +1,118 @@
+# VPSMon agent example configuration
+
+[storage]
+# Path to SQLite database file. Default: /var/lib/vpsmon/metrics.db
+# Example: /var/lib/vpsmon/metrics.db
+# Valid: absolute path, parent directory must be writable.
+db_path=/var/lib/vpsmon/metrics.db
+
+[server]
+# Bind IP address. Default: 127.0.0.1
+bind=127.0.0.1
+# TCP port (1-65535). Default: 7070
+port=7070
+# Enable TLS listener. Default: false
+# Valid: true|false
+tls=false
+# TLS certificate path (required if tls=true).
+tls_cert=/etc/vpsmon/cert.pem
+# TLS private key path (required if tls=true).
+tls_key=/etc/vpsmon/key.pem
+# Per-IP request rate limit (RPS). Default: 10
+# Valid range: 1-1000
+rate_limit_rps=10
+# Comma-separated allowlist. Empty means allow all.
+allowed_ips=127.0.0.1,::1
+# Require API key for TUI/client requests. Default: false
+tui_auth_enabled=false
+
+[poll]
+# Poll interval in milliseconds. Default: 1000
+# Valid range: 200-60000
+interval_ms=1000
+
+[docker]
+# Enable Docker collector. Default: true
+enabled=true
+
+[gpu]
+# GPU backend: auto|nvidia|none. Default: auto
+backend=auto
+
+[alerts]
+# CPU usage threshold %. Default: 90
+cpu_threshold=90
+# RAM usage threshold %. Default: 85
+ram_threshold=85
+# Disk usage threshold %. Default: 90
+disk_threshold=90
+# FD usage threshold %. Default: 80
+fd_threshold=80
+# Health score threshold. Default: 50
+health_score_threshold=50
+# Alert sustained duration seconds. Default: 30
+alert_duration_s=30
+# Warmup seconds after startup. Default: 5
+startup_warmup_s=5
+
+[anomaly]
+# Enable anomaly detection. Default: true
+enabled=true
+# Trigger sigma threshold. Default: 3.0
+threshold_sigma=3.0
+# Minimum data points required. Default: 14
+min_datapoints=14
+
+[channels]
+# Enabled channels: slack,discord,telegram,smtp,pagerduty,webhook
+enabled=smtp
+slack_webhook_url=
+discord_webhook_url=
+telegram_bot_token=
+telegram_chat_id=
+smtp_host=
+smtp_port=587
+smtp_user=
+smtp_pass=
+smtp_from=vpsmon@example.com
+pagerduty_integration_key=
+webhook_url=
+
+[services]
+# Services to watch in systemd.
+watch=nginx,docker
+
+[dns]
+# Enable DNS checks. Default: false
+enabled=false
+# At least one host required when enabled.
+check_hosts=example.com,openai.com
+
+[healthchecks]
+# name=command
+backup=systemctl is-active backup.timer
+
+[maintenance]
+# Optional maintenance status endpoint returning {"active": bool}
+maintenance_check_url=
+
+[config_watch]
+# Watch config files and emit config-change alert.
+enabled=false
+files=/etc/nginx/nginx.conf,/etc/ssh/sshd_config
+
+[uptime]
+# Persist uptime heartbeat.
+enabled=true
+# Heartbeat cadence seconds. Default: 60
+heartbeat_interval_s=60
+
+[recurring_reports]
+# Send summary report emails on schedule.
+enabled=false
+# Cron-like "M H * * *" or daily@HH:MM. Default: daily@09:00
+schedule=daily@09:00
+# Comma-separated recipients.
+recipients=ops@example.com
+# Period in days to summarize. Default: 7
+period_days=7
