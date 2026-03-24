@@ -47,3 +47,19 @@ void clearReloadRequested() {
 }
 
 }  // namespace Signals
+
+void SignalHandler::setup() {
+    Signals::installSignalHandlers();
+}
+
+bool SignalHandler::stopRequested() {
+    return Signals::isStopRequested();
+}
+
+bool SignalHandler::reloadRequested() {
+    return Signals::isReloadRequested();
+}
+
+void SignalHandler::clearReloadRequested() {
+    Signals::clearReloadRequested();
+}
