@@ -1,2 +1,1 @@
-# Servermonitor
-it's a monitor so you can monitor your VPS or Dedicated Server in the best and easy way ever.
+This repository is the initial scaffold for the VPS Health Dashboard monorepo, including placeholders for the monitoring agent, web frontend, shared scripts, and supporting project documentation that will be expanded as implementation begins.
