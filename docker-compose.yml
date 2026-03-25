@@ -1,0 +1,34 @@
+services:
+  agent:
+    build:
+      context: ./vpsmon/agent
+      dockerfile: Dockerfile
+    pid: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - vpsmon-data:/var/lib/vpsmon
+    command: ["/app/build/bin/vpsmon-agent", "--config", "/etc/vpsmon.conf"]
+
+  web:
+    build:
+      context: ./vpsmon/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      VPSMON_WEBHOOK_SECRET: "replace-with-strong-random-value"
+      VPSMON_AUDIT_ANONYMIZE_IPS: "true"
+      VPSMON_SHARES_PATH: "/var/lib/vpsmon-web/shares.json"
+      VPSMON_SILENCES_PATH: "/var/lib/vpsmon-web/silences.json"
+      VPSMON_GROUPS_PATH: "/var/lib/vpsmon-web/groups.json"
+      VPSMON_KEYS_PATH: "/var/lib/vpsmon-web/keys.json"
+      VPSMON_AUDIT_PATH: "/var/lib/vpsmon-web/audit.json"
+      VPSMON_MAINTENANCE_PATH: "/var/lib/vpsmon-web/maintenance.json"
+      VPSMON_WIDGETS_PATH: "/var/lib/vpsmon-web/widgets.json"
+      VPSMON_THRESHOLDS_PATH: "/var/lib/vpsmon-web/thresholds.json"
+    volumes:
+      - vpsmon-web-data:/var/lib/vpsmon-web
+
+volumes:
+  vpsmon-data:
+  vpsmon-web-data:
