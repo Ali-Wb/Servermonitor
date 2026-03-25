@@ -120,7 +120,7 @@ export async function verifyApiKey(key: string, ip: string, userAgent: string): 
         success: true,
         userAgent,
       });
-      return entry.role;
+      return entry.role as AuthRole;
     }
   }
 
@@ -182,7 +182,7 @@ export function verifyApiKeyCached(key: string): AuthRole | null {
     }
 
     if (bcrypt.compareSync(key, entry.keyHash)) {
-      return entry.role;
+      return entry.role as AuthRole;
     }
   }
 

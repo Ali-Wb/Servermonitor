@@ -29,3 +29,5 @@ export type {
   UptimeData,
   UptimeGap,
 } from "@/lib/schemas";
+
+export type { Annotation } from "@/lib/api";
