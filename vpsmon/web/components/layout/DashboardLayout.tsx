@@ -1,10 +1,15 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { useState } from "react";
+
+import { KeyboardHelpOverlay } from "@/components/layout/KeyboardHelpOverlay";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { ServerSearch } from "@/components/layout/ServerSearch";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { useKeyboard } from "@/hooks/useKeyboard";
+import { useTheme } from "@/hooks/useTheme";
 import { Badge } from "@/components/ui/badge";
-import { isMockMode } from "@/lib/mock";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -16,6 +21,14 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, serverId, serverName, isOnline, isMaintenance }: DashboardLayoutProps) {
   const detail = Boolean(serverId);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const { cycleTheme } = useTheme();
+
+  useKeyboard({
+    onToggleHelp: () => setHelpOpen((value) => !value),
+    onToggleTheme: cycleTheme,
+    onRefresh: () => window.location.reload(),
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -54,13 +67,8 @@ export function DashboardLayout({ children, serverId, serverName, isOnline, isMa
         </div>
       </header>
 
-      {isMockMode() ? (
-        <div className="border-b border-amber-500/40 bg-amber-500/10 px-3 py-1 text-center text-xs text-amber-300">
-          Mock mode enabled — data is simulated.
-        </div>
-      ) : null}
-
       <main className="mx-auto max-w-7xl p-4">{children}</main>
+      <KeyboardHelpOverlay open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }

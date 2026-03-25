@@ -9,6 +9,7 @@ import { HistoryGraph } from "@/components/charts/HistoryGraph";
 import { LogsPanel } from "@/components/logs/LogsPanel";
 import { SnapshotDiffDialog } from "@/components/layout/SnapshotDiffDialog";
 import { AlertTicker } from "@/components/alerts/AlertTicker";
+import { SortablePanelWrapper } from "@/components/layout/SortablePanelWrapper";
 import { BandwidthPanel } from "@/components/panels/BandwidthPanel";
 import { ConfigChangesPanel } from "@/components/panels/ConfigChangesPanel";
 import { CpuPanel } from "@/components/panels/CpuPanel";
@@ -18,9 +19,11 @@ import { NetworkPanel } from "@/components/panels/NetworkPanel";
 import { RamPanel } from "@/components/panels/RamPanel";
 import { ServerHeader } from "@/components/panels/ServerHeader";
 import { UptimePanel } from "@/components/panels/UptimePanel";
+import { FullscreenPanel } from "@/components/ui/FullscreenPanel";
 import { useAgentHealth, useAlerts, useAnnotations, useHistory, useMaintenance, useSilences, useSnapshot, useWidgets } from "@/hooks/useMetrics";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useLayout } from "@/hooks/useLayout";
+import { useFullscreen } from "@/hooks/useFullscreen";
 
 interface ServerDashboardProps {
   serverId: string;
@@ -36,7 +39,8 @@ export function ServerDashboard({ serverId }: ServerDashboardProps) {
   useMaintenance(serverId);
   useSilences(serverId);
 
-  const { activeTab, setActiveTab } = useLayout(serverId);
+  const { activeTab, setActiveTab, panelOrder, setPanelOrder } = useLayout(serverId);
+  const { activePanelId, openFullscreen, closeFullscreen } = useFullscreen();
   const [baseline, setBaseline] = useState<string | null>(null);
   const [baselineTs, setBaselineTs] = useState<number | null>(null);
   const [showDiff, setShowDiff] = useState(false);
@@ -123,16 +127,24 @@ export function ServerDashboard({ serverId }: ServerDashboardProps) {
       </div>
 
       {activeTab === "live" ? (
-        <DndContext>
-          <SortableContext items={["cpu", "ram", "disk", "network", "uptime", "logs", "config"]} strategy={verticalListSortingStrategy}>
+        <DndContext onDragEnd={(event) => {
+          const from = panelOrder.indexOf(String(event.active.id));
+          const to = panelOrder.indexOf(String(event.over?.id ?? ""));
+          if (from < 0 || to < 0 || from === to) return;
+          const next = [...panelOrder];
+          const [item] = next.splice(from, 1);
+          next.splice(to, 0, item);
+          setPanelOrder(next);
+        }}>
+          <SortableContext items={panelOrder} strategy={verticalListSortingStrategy}>
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-              <CpuPanel usagePercent={snapshot.cpu.usagePercent} temperatureCelsius={snapshot.cpu.temperatureCelsius} loadAvg1={snapshot.cpu.loadAverage1m} loadAvg5={snapshot.cpu.loadAverage5m} loadAvg15={snapshot.cpu.loadAverage15m} cores={snapshot.cpu.cores} history={[snapshot.cpu.usagePercent]} />
-              <RamPanel usagePercent={snapshot.ram.usagePercent} totalBytes={snapshot.ram.totalBytes} usedBytes={snapshot.ram.usedBytes} freeBytes={snapshot.ram.freeBytes} cachedBytes={snapshot.ram.cachedBytes} bufferedBytes={snapshot.ram.bufferedBytes} swapUsedBytes={snapshot.ram.swapUsedBytes} swapTotalBytes={snapshot.ram.swapTotalBytes} history={[snapshot.ram.usagePercent]} />
-              <DiskPanel mounts={snapshot.disks} />
-              <NetworkPanel interfaces={snapshot.network} rxHistory={snapshot.network.map((n) => n.rxBytesPerSecond)} txHistory={snapshot.network.map((n) => n.txBytesPerSecond)} />
-              <UptimePanel serverId={serverId} />
-              <LogsPanel serverId={serverId} />
-              <ConfigChangesPanel serverId={serverId} />
+              <SortablePanelWrapper id="cpu" title="CPU" onMaximize={openFullscreen}><CpuPanel usagePercent={snapshot.cpu.usagePercent} temperatureCelsius={snapshot.cpu.temperatureCelsius} loadAvg1={snapshot.cpu.loadAverage1m} loadAvg5={snapshot.cpu.loadAverage5m} loadAvg15={snapshot.cpu.loadAverage15m} cores={snapshot.cpu.cores} history={[snapshot.cpu.usagePercent]} /></SortablePanelWrapper>
+              <SortablePanelWrapper id="ram" title="RAM" onMaximize={openFullscreen}><RamPanel usagePercent={snapshot.ram.usagePercent} totalBytes={snapshot.ram.totalBytes} usedBytes={snapshot.ram.usedBytes} freeBytes={snapshot.ram.freeBytes} cachedBytes={snapshot.ram.cachedBytes} bufferedBytes={snapshot.ram.bufferedBytes} swapUsedBytes={snapshot.ram.swapUsedBytes} swapTotalBytes={snapshot.ram.swapTotalBytes} history={[snapshot.ram.usagePercent]} /></SortablePanelWrapper>
+              <SortablePanelWrapper id="disk" title="Disk" onMaximize={openFullscreen}><DiskPanel mounts={snapshot.disks} /></SortablePanelWrapper>
+              <SortablePanelWrapper id="network" title="Network" onMaximize={openFullscreen}><NetworkPanel interfaces={snapshot.network} rxHistory={snapshot.network.map((n) => n.rxBytesPerSecond)} txHistory={snapshot.network.map((n) => n.txBytesPerSecond)} /></SortablePanelWrapper>
+              <SortablePanelWrapper id="uptime" title="Uptime" onMaximize={openFullscreen}><UptimePanel serverId={serverId} /></SortablePanelWrapper>
+              <SortablePanelWrapper id="logs" title="Logs" onMaximize={openFullscreen}><LogsPanel serverId={serverId} /></SortablePanelWrapper>
+              <SortablePanelWrapper id="config_changes" title="Config changes" onMaximize={openFullscreen}><ConfigChangesPanel serverId={serverId} /></SortablePanelWrapper>
               {widgets.map((widget) => <CustomWidgetPanel key={widget.id} widget={widget} snapshot={snapshot} />)}
             </div>
           </SortableContext>
@@ -155,6 +167,9 @@ export function ServerDashboard({ serverId }: ServerDashboardProps) {
       {activeTab === "logs" ? <LogsPanel serverId={serverId} /> : null}
 
       {showDiff && baseline && baselineTs ? <SnapshotDiffDialog baseline={JSON.parse(baseline)} current={snapshot} baselineTs={baselineTs} onClose={() => setShowDiff(false)} /> : null}
+      <FullscreenPanel open={activePanelId !== null} title={activePanelId ?? ""} onClose={closeFullscreen}>
+        <p className="text-sm text-muted-foreground">Fullscreen view for panel: {activePanelId}</p>
+      </FullscreenPanel>
 
       <AlertTicker alerts={filteredAlerts} />
     </div>
