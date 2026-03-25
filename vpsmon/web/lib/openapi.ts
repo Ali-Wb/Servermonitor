@@ -20,19 +20,19 @@ const ErrorSchema = z.object({ error: z.string() });
 
 export function buildOpenApiDocument() {
   const components = {
-    Snapshot: zodToJsonSchema(SnapshotSchema as any, "Snapshot"),
-    AlertEvent: zodToJsonSchema(AlertEventSchema as any, "AlertEvent"),
-    AlertComment: zodToJsonSchema(AlertCommentSchema as any, "AlertComment"),
-    AgentHealth: zodToJsonSchema(AgentHealthSchema as any, "AgentHealth"),
-    BandwidthPeriod: zodToJsonSchema(BandwidthPeriodSchema as any, "BandwidthPeriod"),
-    UptimeData: zodToJsonSchema(UptimeDataSchema as any, "UptimeData"),
-    ServerGroup: zodToJsonSchema(ServerGroupSchema as any, "ServerGroup"),
-    MaintenanceWindow: zodToJsonSchema(MaintenanceWindowSchema as any, "MaintenanceWindow"),
-    CustomWidget: zodToJsonSchema(CustomWidgetSchema as any, "CustomWidget"),
-    Silence: zodToJsonSchema(SilenceSchema as any, "Silence"),
-    ShareToken: zodToJsonSchema(ShareTokenSchema as any, "ShareToken"),
-    AuditEntry: zodToJsonSchema(AuditEntrySchema as any, "AuditEntry"),
-    Error: zodToJsonSchema(ErrorSchema as any, "Error"),
+    Snapshot: zodToJsonSchema(SnapshotSchema, "Snapshot"),
+    AlertEvent: zodToJsonSchema(AlertEventSchema, "AlertEvent"),
+    AlertComment: zodToJsonSchema(AlertCommentSchema, "AlertComment"),
+    AgentHealth: zodToJsonSchema(AgentHealthSchema, "AgentHealth"),
+    BandwidthPeriod: zodToJsonSchema(BandwidthPeriodSchema, "BandwidthPeriod"),
+    UptimeData: zodToJsonSchema(UptimeDataSchema, "UptimeData"),
+    ServerGroup: zodToJsonSchema(ServerGroupSchema, "ServerGroup"),
+    MaintenanceWindow: zodToJsonSchema(MaintenanceWindowSchema, "MaintenanceWindow"),
+    CustomWidget: zodToJsonSchema(CustomWidgetSchema, "CustomWidget"),
+    Silence: zodToJsonSchema(SilenceSchema, "Silence"),
+    ShareToken: zodToJsonSchema(ShareTokenSchema, "ShareToken"),
+    AuditEntry: zodToJsonSchema(AuditEntrySchema, "AuditEntry"),
+    Error: zodToJsonSchema(ErrorSchema, "Error"),
   };
 
   return {
