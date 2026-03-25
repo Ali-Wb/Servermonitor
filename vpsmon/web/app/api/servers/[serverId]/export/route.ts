@@ -38,5 +38,5 @@ export async function GET(req: Request, { params }: { params: Promise<{ serverId
   }
 
   const pdf = await generateSummaryReport({ history, sections }, { sections, companyName: parsed.data.companyName });
-  return new Response(pdf as unknown as BodyInit, { headers: { "content-type": "application/pdf" } });
+  return new NextResponse(pdf, { headers: { "content-type": "application/pdf" } });
 }

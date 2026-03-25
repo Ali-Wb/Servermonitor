@@ -51,30 +51,18 @@ void AlertEngine::trigger(const std::string& metric, const AlertMessage& message
 }
 
 void AlertEngine::evaluate() {
-    AlertMessage message;
-    message.title = "Health score warning";
-    message.subject = "Health score warning";
-    message.body = "health score threshold exceeded";
-    message.severity = "warning";
+    const AlertMessage message{"Health score warning", "health score threshold exceeded", "warning"};
     trigger("health_score", message, false, false);
 }
 
 std::vector<std::string> AlertEngine::triggerTest() {
-    AlertMessage message;
-    message.title = "Test alert";
-    message.subject = "Test alert";
-    message.body = "manual test";
-    message.severity = "info";
+    const AlertMessage message{"Test alert", "manual test", "info"};
     trigger("test_alert", message, true, true);
     return enabledChannels();
 }
 
 void AlertEngine::triggerConfigChangeAlert(const std::string& filename) {
-    AlertMessage message;
-    message.title = "Config changed";
-    message.subject = "Config changed";
-    message.body = "file changed: " + filename;
-    message.severity = "warning";
+    const AlertMessage message{"Config changed", "file changed: " + filename, "warning"};
     trigger("config_change", message, true, true);
 }
 
