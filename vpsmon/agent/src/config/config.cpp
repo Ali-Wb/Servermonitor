@@ -60,6 +60,8 @@ void applyEntry(AgentConfig& cfg, const std::string& section, const std::string&
         else if (key == "tui_auth_enabled") cfg.tui_auth_enabled = parseBool(value);
     } else if (section == "poll") {
         if (key == "interval_ms") cfg.interval_ms = std::stoi(value);
+    } else if (section == "storage") {
+        if (key == "db_path") cfg.db_path = value;
     } else if (section == "alerts") {
         if (key == "cpu_threshold") cfg.cpu_threshold = std::stof(value);
         else if (key == "ram_threshold") cfg.ram_threshold = std::stof(value);
@@ -88,7 +90,12 @@ void applyEntry(AgentConfig& cfg, const std::string& section, const std::string&
     } else if (section == "services") {
         if (key == "watch") cfg.services = splitCsv(value);
     } else if (section == "dns") {
-        if (key == "check_hosts") cfg.dns_check_hosts = splitCsv(value);
+        if (key == "enabled") cfg.dns_enabled = parseBool(value);
+        else if (key == "check_hosts") cfg.dns_check_hosts = splitCsv(value);
+    } else if (section == "docker") {
+        if (key == "enabled") cfg.docker_enabled = parseBool(value);
+    } else if (section == "gpu") {
+        if (key == "backend") cfg.gpu_backend = value;
     } else if (section == "healthchecks") {
         cfg.healthchecks[key] = value;  // split done on first '=' during parsing.
     } else if (section == "maintenance") {

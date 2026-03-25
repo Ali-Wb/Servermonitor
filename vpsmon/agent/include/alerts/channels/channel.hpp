@@ -6,8 +6,11 @@
 
 struct AlertMessage {
     std::string title;
+    std::string subject;
     std::string body;
+    std::string htmlBody;
     std::string severity;
+    std::string recipient;
 };
 
 bool sendSlack(const AgentConfig& config, const AlertMessage& message);

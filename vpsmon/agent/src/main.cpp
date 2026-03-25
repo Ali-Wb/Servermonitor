@@ -1,4 +1,5 @@
 #include "config/config.hpp"
+#include "util/config_validator.hpp"
 #include "util/logger.hpp"
 #include "util/signals.hpp"
 
@@ -28,27 +29,6 @@ struct CliOptions {
     bool disableTls = false;
     bool checkConfig = false;
     bool update = false;
-};
-
-class ConfigValidator {
-public:
-    static bool validate(const std::string& path) {
-        try {
-            const AgentConfig config = Config::load(path);
-            if (config.port <= 0 || config.port > 65535) {
-                std::fprintf(stderr, "Invalid port in config: %d\n", config.port);
-                return false;
-            }
-            if (config.interval_ms <= 0) {
-                std::fprintf(stderr, "Invalid poll interval_ms in config: %d\n", config.interval_ms);
-                return false;
-            }
-            return true;
-        } catch (const std::exception& ex) {
-            std::fprintf(stderr, "Config validation failed: %s\n", ex.what());
-            return false;
-        }
-    }
 };
 
 class MetricsStore {
@@ -219,7 +199,9 @@ int main(int argc, char** argv) {
 
         // 2. If --check-config: ConfigValidator::validate(config), exit 0/1
         if (cli.checkConfig) {
-            return ConfigValidator::validate(cli.configPath) ? 0 : 1;
+            AgentConfig cfg = Config::loadOrDefault(cli.configPath);
+            const auto checks = ConfigValidator::validate(cfg, cli.update);
+            return ConfigValidator::printResults(checks);
         }
 
         if (cli.json || cli.metrics) {

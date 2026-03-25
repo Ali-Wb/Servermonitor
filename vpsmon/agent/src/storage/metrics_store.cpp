@@ -168,6 +168,12 @@ void MetricsStore::createSchema() {
         "created_at INTEGER"
         ");"
     );
+    db_->exec(
+        "CREATE TABLE IF NOT EXISTS scheduler_state("
+        "name TEXT PRIMARY KEY,"
+        "last_run_ms INTEGER NOT NULL"
+        ");"
+    );
 }
 
 void MetricsStore::ensureOpen() const {
@@ -400,6 +406,26 @@ void MetricsStore::updateAnomalyBaseline() {
             {metric, std::to_string(hour), std::to_string(tsMs), metric}
         );
     }
+}
+
+int64_t MetricsStore::loadSchedulerState(const std::string& name) const {
+    ensureOpen();
+    const Database::QueryResult rows = db_->query(
+        "SELECT last_run_ms FROM scheduler_state WHERE name=?;",
+        {name}
+    );
+    if (rows.empty()) return 0;
+    const auto it = rows.front().find("last_run_ms");
+    return it == rows.front().end() ? 0 : toInt64(it->second);
+}
+
+void MetricsStore::saveSchedulerState(const std::string& name, int64_t lastRunMs) {
+    ensureOpen();
+    db_->exec(
+        "INSERT INTO scheduler_state(name,last_run_ms) VALUES(?,?) "
+        "ON CONFLICT(name) DO UPDATE SET last_run_ms=excluded.last_run_ms;",
+        {name, std::to_string(lastRunMs)}
+    );
 }
 
 void MetricsStore::aggregateAndPrune(

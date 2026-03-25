@@ -29,6 +29,8 @@ public:
     bool acknowledgeAlert(int alertId, const std::string& acknowledgedBy, int64_t acknowledgedAtMs = 0);
     UptimeStats queryUptime(const std::string& period) const;
     void updateAnomalyBaseline();
+    int64_t loadSchedulerState(const std::string& name) const;
+    void saveSchedulerState(const std::string& name, int64_t lastRunMs);
 
     // Cooldown persistence.
     void saveCooldown(const std::string& metric, int64_t lastFiredMs);

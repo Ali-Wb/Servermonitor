@@ -5,6 +5,9 @@
 #include <vector>
 
 struct AgentConfig {
+    // [storage]
+    std::string db_path = "/var/lib/vpsmon/metrics.db";
+
     // [server]
     int port = 7070;
     std::string bind = "127.0.0.1";
@@ -50,7 +53,14 @@ struct AgentConfig {
     std::vector<std::string> services;
 
     // [dns]
+    bool dns_enabled = false;
     std::vector<std::string> dns_check_hosts;
+
+    // [docker]
+    bool docker_enabled = true;
+
+    // [gpu]
+    std::string gpu_backend = "auto";
 
     // [healthchecks]
     std::unordered_map<std::string, std::string> healthchecks;
