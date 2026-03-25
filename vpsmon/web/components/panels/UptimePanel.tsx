@@ -3,14 +3,19 @@
 import { useState } from "react";
 
 import { useUptimeData } from "@/hooks/useMetrics";
+import type { UptimeData } from "@/lib/schemas";
 
-interface UptimePanelProps { serverId: string }
+interface UptimePanelProps {
+  serverId?: string;
+  data?: UptimeData;
+}
 
 const PERIODS = ["day", "week", "month"] as const;
 
-export function UptimePanel({ serverId }: UptimePanelProps) {
+export function UptimePanel({ serverId, data: fixedData }: UptimePanelProps) {
   const [period, setPeriod] = useState<(typeof PERIODS)[number]>("day");
-  const { data } = useUptimeData(serverId, period);
+  const uptimeQuery = useUptimeData(serverId ?? "", period);
+  const data = fixedData ?? uptimeQuery.data;
 
   const pct = data?.uptimePercent ?? 0;
   const pctClass = pct >= 99.9 ? "text-emerald-500" : pct >= 99 ? "text-amber-500" : "text-red-500";
