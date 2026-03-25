@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactCompiler: false,
-  cacheComponents: true,
+  reactCompiler: true,
+  turbopackFileSystemCache: true,
+  output: "standalone",
 };
 
 export default nextConfig;
