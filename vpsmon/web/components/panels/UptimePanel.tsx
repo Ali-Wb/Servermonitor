@@ -24,7 +24,7 @@ export function UptimePanel({ serverId, data: fixedData }: UptimePanelProps) {
 
   return (
     <section className="rounded-lg border bg-card p-4">
-      {fixedData ? null : <div className="mb-2 flex gap-1">{PERIODS.map((p) => <button type="button" key={p} className={`rounded border px-2 py-1 text-xs ${p === period ? "bg-muted" : ""}`} onClick={() => setPeriod(p)}>{p}</button>)}</div>}
+      <div className="mb-2 flex gap-1">{PERIODS.map((p) => <button type="button" key={p} className={`rounded border px-2 py-1 text-xs ${p === period ? "bg-muted" : ""}`} onClick={() => setPeriod(p)}>{p}</button>)}</div>
       <div className={`font-mono text-4xl font-semibold ${pctClass}`}>{pct.toFixed(3)}%</div>
       <div className="relative mt-3 h-3 overflow-hidden rounded bg-emerald-500/70">
         {data?.gaps.map((gap, index) => {
