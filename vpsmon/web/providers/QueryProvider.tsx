@@ -5,14 +5,13 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
-export function QueryProvider({ children }: PropsWithChildren): React.JSX.Element {
+export function QueryProvider({ children }: PropsWithChildren) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 0,
-            retry: 2,
+            staleTime: 30_000,
             refetchOnWindowFocus: false,
           },
         },
