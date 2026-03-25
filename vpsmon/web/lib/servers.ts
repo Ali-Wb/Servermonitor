@@ -1,6 +1,7 @@
 import net from "node:net";
 import tls from "node:tls";
 
+import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 
 const ServerConfigSchema = z.object({
@@ -54,6 +55,10 @@ export async function agentRequest(
         try {
           resolve(JSON.parse(line));
         } catch (error) {
+          Sentry.captureException(error, {
+            tags: { scope: "agent_tcp", server: server.id, stage: "parse_response" },
+            extra: { response: line.slice(0, 500) },
+          });
           reject(error);
         }
         socket.destroy();
@@ -61,6 +66,10 @@ export async function agentRequest(
     };
 
     const onError = (error: Error) => {
+      Sentry.captureException(error, {
+        tags: { scope: "agent_tcp", server: server.id, stage: "socket" },
+        extra: { host: server.host, port: server.port, tls: server.tls, payload: reqPayload },
+      });
       reject(error);
     };
 
@@ -69,6 +78,11 @@ export async function agentRequest(
       : net.connect({ host: server.host, port: server.port });
 
     socket.setTimeout(timeoutMs, () => {
+      Sentry.captureMessage("agent tcp timeout", {
+        level: "warning",
+        tags: { scope: "agent_tcp", server: server.id, stage: "timeout" },
+        extra: { timeoutMs, host: server.host, port: server.port, tls: server.tls, payload: reqPayload },
+      });
       socket.destroy(new Error("agent timeout"));
     });
 

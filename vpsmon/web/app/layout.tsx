@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { WebVitals } from "@/components/WebVitals";
 import { IntervalsProvider } from "@/providers/IntervalsProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
@@ -19,7 +20,10 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <IntervalsProvider>
-            <QueryProvider>{children}</QueryProvider>
+            <QueryProvider>
+              {children}
+              <WebVitals />
+            </QueryProvider>
           </IntervalsProvider>
         </ThemeProvider>
       </body>
