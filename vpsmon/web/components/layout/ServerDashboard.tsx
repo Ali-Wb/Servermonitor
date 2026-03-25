@@ -7,6 +7,8 @@ import { useMemo, useState } from "react";
 
 import { HistoryGraph } from "@/components/charts/HistoryGraph";
 import { LogsPanel } from "@/components/logs/LogsPanel";
+import { AgentOffline } from "@/components/states/AgentOffline";
+import { PageSkeleton } from "@/components/states/PageSkeleton";
 import { SnapshotDiffDialog } from "@/components/layout/SnapshotDiffDialog";
 import { AlertTicker } from "@/components/alerts/AlertTicker";
 import { SortablePanelWrapper } from "@/components/layout/SortablePanelWrapper";
@@ -66,11 +68,11 @@ export function ServerDashboard({ serverId }: ServerDashboardProps) {
   }
 
   if (snapshotQuery.isPending) {
-    return <section className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">PageSkeleton</section>;
+    return <PageSkeleton />;
   }
 
   if (!snapshotQuery.data) {
-    return <section className="rounded-lg border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-200">AgentOffline</section>;
+    return <AgentOffline serverId={serverId} />;
   }
 
   const snapshot = snapshotQuery.data;

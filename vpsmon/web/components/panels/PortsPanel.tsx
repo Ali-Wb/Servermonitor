@@ -1,5 +1,8 @@
 "use client";
 
+import { GripVertical } from "lucide-react";
+
+import { WELL_KNOWN_PORTS } from "@/lib/format";
 import type { OpenPort } from "@/lib/schemas";
 
 interface PortsPanelProps { ports: OpenPort[] }
@@ -19,7 +22,10 @@ export function PortsPanel({ ports }: PortsPanelProps) {
   const sorted = [...ports].sort((a, b) => a.port - b.port);
   return (
     <section className="rounded-lg border bg-card p-4">
-      <h3 className="mb-2 text-sm font-medium">Open Ports</h3>
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-sm font-medium">Open Ports</h3>
+        <GripVertical className="h-4 w-4 text-muted-foreground" />
+      </div>
       <table className="w-full text-left text-xs">
         <thead className="text-muted-foreground"><tr><th>Port</th><th>Protocol</th><th>Service</th><th>Process</th></tr></thead>
         <tbody>
